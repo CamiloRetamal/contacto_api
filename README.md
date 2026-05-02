@@ -55,7 +55,7 @@ Ruta base: **`/api/v1/contactos`** (versionado por URL con `Asp.Versioning`).
 - `GET /api/v1/contactos/{id}` — detalle o `404`
 - `POST /api/v1/contactos` — alta; `201` con cabecera `Location`, `400` si falla la validación, `409` si el teléfono ya existe
 
-### Bonus (según PDF / enunciado)
+### Bonus 
 
 - **Repositorio** — `IContactRepository` / `ContactRepository`
 - **CQRS ligero** — `IContactQueries` / `ContactQueries` (lecturas) e `IContactCommands` / `ContactCommands` (escrituras)
