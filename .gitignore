@@ -1,0 +1,42 @@
+## Build outputs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+**/bin/
+**/obj/
+
+## Visual Studio / Rider
+.vs/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.rsuser
+.idea/
+
+## Test & coverage
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+
+## NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## ASP.NET
+appsettings.*.local.json
+*.pubxml.user
+
+## OS & misc
+.DS_Store
+Thumbs.db
+*.swp
+*~
