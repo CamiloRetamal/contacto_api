@@ -18,7 +18,46 @@ Desde la raíz de este proyecto:
 dotnet run --project src/Contactos.Api/Contactos.Api.csproj
 ```
 
-La API escucha en `http://localhost:5xxx` (el puerto exacto aparece en consola). En entorno **Development**, **Swagger** está disponible en `/swagger`.
+El puerto exacto aparece en consola (por defecto suele ser **`http://localhost:5233`** según `Properties/launchSettings.json`).
+
+---
+
+## Documentación API (Swagger)
+
+En entorno **Development**, **Swagger UI** está habilitado para explorar y probar la API sin Postman. La UI es el documento **`swagger/index.html`**; conviene abrir la ruta completa:
+
+**http://localhost:5233/swagger/index.html**
+
+También suele funcionar **`http://localhost:5233/swagger`** (redirige o carga la misma UI).
+
+Si cambias el perfil o el puerto, usa la URL base que imprima `dotnet run` y sustituye solo el host/puerto, manteniendo **`/swagger/index.html`**.
+
+---
+
+## Ejemplo rápido con curl
+
+Copiar y pegar (ajusta host/puerto si tu consola muestra otro):
+
+```bash
+curl -X POST http://localhost:5233/api/v1/contactos \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Juan","telefono":"123456"}'
+```
+
+Listado:
+
+```bash
+curl http://localhost:5233/api/v1/contactos
+```
+
+---
+
+## Decisiones técnicas
+
+- **Persistencia en memoria** para acotar el alcance del desafío y evitar infraestructura externa, manteniendo el foco en la API y las reglas de negocio.
+- **`lock` en el repositorio** para garantizar consistencia ante **POST concurrentes** con el mismo teléfono (comprobación de duplicado y alta atómicas).
+- **CQRS ligero** (`IContactQueries` / `IContactCommands`) para separar lecturas y escrituras y facilitar tests y evolución.
+- **Middleware** para correlación de peticiones y **manejo global de errores** con respuestas coherentes (`application/problem+json`).
 
 ---
 
