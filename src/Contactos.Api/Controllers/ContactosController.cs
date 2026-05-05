@@ -48,16 +48,14 @@ public sealed class ContactosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public ActionResult<ContactoResponseDto> Create([FromBody] CreateContactoRequestDto request)
     {
-        var version = RouteData.Values["version"]?.ToString()
-                      ?? ApiVersionConstants.V1Literal;
         return _commands.Create(request) switch
         {
             ContactCreateSuccess s => CreatedAtAction(
                 nameof(GetById),
-                new { version, id = s.Contact.Id },
+                new { id = s.Contact.Id },
                 Map(s.Contact)),
             ContactCreateDuplicate => ConflictProblem(),
-            ContactCreateValidation => BadRequestProblem(),
+            ContactCreateValidation validation => BadRequestProblem(validation.Message),
             _ => throw new InvalidOperationException("Unhandled ContactCreateResult."),
         };
     }
@@ -70,11 +68,11 @@ public sealed class ContactosController : ControllerBase
         };
     }
 
-    private ObjectResult BadRequestProblem()
+    private ObjectResult BadRequestProblem(string detail)
     {
         return new ObjectResult(BuildProblem(
                 PublicErrorMessages.ValidationTitle,
-                PublicErrorMessages.ValidationDetail,
+                detail,
                 StatusCodes.Status400BadRequest))
         {
             StatusCode = StatusCodes.Status400BadRequest,

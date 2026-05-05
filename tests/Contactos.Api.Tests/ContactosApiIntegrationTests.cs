@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using Contactos.Api.Core.ApiVersioning;
+using Contactos.Api.Core.Constants;
 using Contactos.Api.Core.Dtos;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Contactos.Api.Tests;
@@ -9,6 +11,7 @@ namespace Contactos.Api.Tests;
 public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
+    private static readonly string ContactsPath = $"/{ApiRouteTemplates.Contacts}";
 
     public ContactosApiIntegrationTests(WebApplicationFactory<Program> factory)
     {
@@ -19,7 +22,7 @@ public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationF
     public async Task Post_and_Get_by_id_return_201_and_200()
     {
         var createResponse = await _client.PostAsJsonAsync(
-            ApiRouteTemplates.V1ContactsPath,
+            ContactsPath,
             new CreateContactoRequestDto { Nombre = "Juan Perez", Telefono = "123456789" });
 
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
@@ -27,7 +30,7 @@ public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationF
         Assert.NotNull(created);
         Assert.True(created.Id > 0);
 
-        var getResponse = await _client.GetAsync($"{ApiRouteTemplates.V1ContactsPath}/{created.Id}");
+        var getResponse = await _client.GetAsync($"{ContactsPath}/{created.Id}");
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
         var roundTrip = await getResponse.Content.ReadFromJsonAsync<ContactoResponseDto>();
         Assert.Equal(created.Id, roundTrip?.Id);
@@ -38,7 +41,7 @@ public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationF
     [Fact]
     public async Task Get_by_unknown_id_returns_404()
     {
-        var response = await _client.GetAsync($"{ApiRouteTemplates.V1ContactsPath}/99999");
+        var response = await _client.GetAsync($"{ContactsPath}/99999");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
@@ -46,9 +49,9 @@ public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationF
     public async Task Post_duplicate_telephone_returns_409()
     {
         var body = new CreateContactoRequestDto { Nombre = "A", Telefono = "5551234567" };
-        Assert.Equal(HttpStatusCode.Created, (await _client.PostAsJsonAsync(ApiRouteTemplates.V1ContactsPath, body)).StatusCode);
+        Assert.Equal(HttpStatusCode.Created, (await _client.PostAsJsonAsync(ContactsPath, body)).StatusCode);
 
-        var dup = await _client.PostAsJsonAsync(ApiRouteTemplates.V1ContactsPath, new CreateContactoRequestDto
+        var dup = await _client.PostAsJsonAsync(ContactsPath, new CreateContactoRequestDto
         {
             Nombre = "B",
             Telefono = "5551234567",
@@ -61,10 +64,14 @@ public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationF
     public async Task Post_invalid_telephone_returns_400()
     {
         var res = await _client.PostAsJsonAsync(
-            ApiRouteTemplates.V1ContactsPath,
+            ContactsPath,
             new CreateContactoRequestDto { Nombre = "A", Telefono = "not-a-number" });
 
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+        var problem = await res.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal(PublicErrorMessages.ValidationTitle, problem.Title);
+        Assert.Equal(PublicErrorMessages.ValidationDetailInvalidTelephone, problem.Detail);
     }
 
     [Fact]
@@ -74,7 +81,7 @@ public sealed class ContactosApiIntegrationTests : IClassFixture<WebApplicationF
         const int parallel = 50;
         var tasks = Enumerable.Range(0, parallel).Select(i =>
             _client.PostAsJsonAsync(
-                ApiRouteTemplates.V1ContactsPath,
+                ContactsPath,
                 new CreateContactoRequestDto { Nombre = $"ConcurrentUser{i}", Telefono = sharedPhone }));
         var responses = await Task.WhenAll(tasks);
 

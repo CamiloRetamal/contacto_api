@@ -39,7 +39,7 @@ Si cambias el perfil o el puerto, usa la URL base que imprima `dotnet run` y sus
 Copiar y pegar (ajusta host/puerto si tu consola muestra otro):
 
 ```bash
-curl -X POST http://localhost:5233/api/v1/contactos \
+curl -X POST http://localhost:5233/api/contactos \
   -H "Content-Type: application/json" \
   -d '{"nombre":"Juan","telefono":"123456"}'
 ```
@@ -47,7 +47,7 @@ curl -X POST http://localhost:5233/api/v1/contactos \
 Listado:
 
 ```bash
-curl http://localhost:5233/api/v1/contactos
+curl http://localhost:5233/api/contactos
 ```
 
 ---
@@ -86,13 +86,13 @@ El repositorio mantiene el estado compartido bajo un único **`lock`**: la compr
 
 ---
 
-## Endpoints (versionados)
+## Endpoints
 
-Ruta base: **`/api/v1/contactos`** (versionado por URL con `Asp.Versioning`).
+Ruta base: **`/api/contactos`**.
 
-- `GET /api/v1/contactos` — listado (puede estar vacío)
-- `GET /api/v1/contactos/{id}` — detalle o `404`
-- `POST /api/v1/contactos` — alta; `201` con cabecera `Location`, `400` si falla la validación, `409` si el teléfono ya existe
+- `GET /api/contactos` — listado (puede estar vacío)
+- `GET /api/contactos/{id}` — detalle o `404`
+- `POST /api/contactos` — alta; `201` con cabecera `Location`, `400` si falla la validación, `409` si el teléfono ya existe
 
 ### Bonus 
 
@@ -102,7 +102,7 @@ Ruta base: **`/api/v1/contactos`** (versionado por URL con `Asp.Versioning`).
 - **Records** — dominio `Contacto`, DTOs y jerarquía `ContactCreateResult`
 - **Logging estructurado** — **Serilog** + `CorrelationId` en `LogContext` (ver `CorrelationIdMiddleware`, `appsettings.json`)
 - **Middleware propio** — id de correlación + manejador global de excepciones (`application/problem+json`)
-- **Versionado de API** — v1 en la URL; Swagger UI muestra el documento versionado
+- **Versionado de API** — versión por defecto configurada en backend y documentación en Swagger
 
 Ejemplo de cuerpo `POST` (nombres de propiedades JSON según el desafío):
 

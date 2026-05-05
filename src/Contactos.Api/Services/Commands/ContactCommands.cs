@@ -1,4 +1,5 @@
 using Contactos.Api.Application.Contacts;
+using Contactos.Api.Core.Constants;
 using Contactos.Api.Core.Dtos;
 using Contactos.Api.Core.Exceptions;
 using Contactos.Api.Core.Validation;
@@ -29,7 +30,7 @@ public sealed class ContactCommands : IContactCommands
                 "Contact create rejected: missing name or telephone (Nombre empty: {NombreEmpty}, Telefono empty: {TelefonoEmpty}).",
                 string.IsNullOrEmpty(name),
                 string.IsNullOrEmpty(phoneRaw));
-            return new ContactCreateValidation("Name and telephone are required.");
+            return new ContactCreateValidation(PublicErrorMessages.ValidationDetailMissingFields);
         }
 
         string phoneDigits;
@@ -40,7 +41,7 @@ public sealed class ContactCommands : IContactCommands
         catch (DomainValidationException ex)
         {
             _logger.LogInformation(ex, "Contact create rejected: invalid telephone for {Nombre}.", name);
-            return new ContactCreateValidation(ex.Message);
+            return new ContactCreateValidation(PublicErrorMessages.ValidationDetailInvalidTelephone);
         }
 
         var created = _repository.Add(name, phoneDigits);

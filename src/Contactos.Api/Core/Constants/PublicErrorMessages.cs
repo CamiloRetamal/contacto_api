@@ -12,6 +12,8 @@ public static class PublicErrorMessages
     public const string ValidationTitle = "Solicitud inválida";
     public const string ValidationDetail =
         "La solicitud no pudo ser procesada. Verifique los datos enviados.";
+    public const string ValidationDetailMissingFields = "Nombre y teléfono son obligatorios.";
+    public const string ValidationDetailInvalidTelephone = "El número telefónico no es válido.";
 
     public const string ServerErrorTitle = "Error interno del servidor";
     public const string ServerErrorDetail =

@@ -28,6 +28,7 @@ try
         options.DefaultApiVersion = ApiVersionConstants.Default;
         options.AssumeDefaultVersionWhenUnspecified = true;
         options.ReportApiVersions = true;
+        options.ApiVersionReader = new UrlSegmentApiVersionReader();
     }).AddMvc()
     .AddApiExplorer(options =>
     {
